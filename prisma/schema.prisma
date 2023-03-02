@@ -16,6 +16,18 @@ model PageScreen {
   enrollmentDate String
 }
 
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  googleId  String   @unique
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  roles     String?
+  Team      Team[]
+  Player    Player[]
+}
+
 model Admin {
   id       String @id @default(cuid())
   name     String
@@ -30,6 +42,7 @@ model Championship {
   maxNumberPlayers Decimal
   maxNumberTeams   Decimal
   Game             Game[]
+  teams            Team[]
 }
 
 model Game {
@@ -40,11 +53,17 @@ model Game {
 }
 
 model Team {
-  id      String   @id @default(cuid())
-  name    String   @unique
-  players Player[]
-  games   Game[]
-  status  String?
+  id             String        @id @default(cuid())
+  logo           String?
+  name           String        @unique
+  description    String?
+  owner          User          @relation(fields: [userId], references: [id])
+  players        Player[]
+  games          Game[]
+  status         String?
+  userId         String
+  Championship   Championship? @relation(fields: [championshipId], references: [id])
+  championshipId String?
 }
 
 model Player {
@@ -52,7 +71,8 @@ model Player {
   name        String
   shirtNumber Decimal?
   points      Decimal?
-  teamId      String
-
-  team Team @relation(fields: [teamId], references: [id])
+  teamId      String?
+  user        User     @relation(fields: [userId], references: [id])
+  Team        Team?    @relation(fields: [teamId], references: [id])
+  userId      String
 }

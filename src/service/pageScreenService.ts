@@ -1,5 +1,5 @@
-import PageScreenDTO from '../dto/pageScreenDto';
 import { prisma } from "../lib/prisma";
+import {z} from 'zod';
 
 export const getPageScreenContent = async ()=>{
     try{
@@ -11,8 +11,15 @@ export const getPageScreenContent = async ()=>{
     }
 }
 
-export const updatePageScreen = async (content: PageScreenDTO)=>{
+export const updatePageScreen = async (req: Object)=>{
     try{
+        const body = z.object({
+            id: z.string(),
+            title: z.string(),
+            enrollmentDate: z.string()
+        });
+
+       const content = body.parse(req);
        const response = await prisma.pageScreen.update({
             where: {
                 id: content.id
@@ -21,7 +28,8 @@ export const updatePageScreen = async (content: PageScreenDTO)=>{
             }
         })
         return response;
-    }catch(e){
-        
+    }catch(error){
+        console.log(error);
+        throw error;
     }
 }
